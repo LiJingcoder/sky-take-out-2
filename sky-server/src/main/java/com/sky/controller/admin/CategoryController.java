@@ -58,8 +58,7 @@ public class CategoryController {
 
     @DeleteMapping
     @ApiOperation("根据id删除分类")
-    //这部分内容涉及其他两个类的管理待修改
-
+    //TODO 这部分内容涉及其他两个类的管理待修改
     public Result deleteById(Long id){
         categoryService.deleteById(id);
         return Result.success();
