@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 分类管理
  */
@@ -62,5 +64,12 @@ public class CategoryController {
     public Result deleteById(Long id){
         categoryService.deleteById(id);
         return Result.success();
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("根据类型查询分类")
+    public Result getByType(Integer type){
+        List<Category> list = categoryService.getByType(type);
+        return Result.success(list);
     }
 }
