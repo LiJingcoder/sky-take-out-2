@@ -95,9 +95,55 @@ public class DishServiceImpl implements DishService {
 
         //删除菜品表中的菜品数据
         //删除菜品关联的口味数据
-        for (Long id : ids) {
-            dishMapper.delete(id);
-            dishFlavorMapper.delete(id);
+//        for (Long id : ids) {
+//            dishMapper.delete(id);
+//            dishFlavorMapper.delete(id);
+//        }
+
+        //下面给出优化代码：批量删除
+        dishMapper.deleteBatch(ids);
+        dishFlavorMapper.deleteBatch(ids);
+    }
+
+
+     /**
+     * 根据id查询菜品和对应口味
+     * @param id
+     * @return
+     */
+    public DishVO getByIdWithFlavor(Long id) {
+        //根据菜品id查询菜品数据
+        Dish dish = dishMapper.getById(id);
+
+        //根据菜品id查询口味数据
+        List<DishFlavor> dishFlavors = dishMapper.getByDishId(id);
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish,dishVO);//复制一部分信息到dishVO中
+        dishVO.setFlavors(dishFlavors);
+        return dishVO;
+    }
+
+    /**
+     * 根据id查询菜品和对应口味
+     * @param dishDTO
+     */
+    public void updateWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        //修改菜品表基本信息
+        dishMapper.update(dish);
+
+        //删除原有的口味数据
+        dishFlavorMapper.delete(dishDTO.getId());
+
+        //重新插入口味数据：批量插入
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if(flavors != null && flavors.size() > 0){
+            //批量插入，sql支持批量插入
+            flavors.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insertBatch(flavors);
         }
     }
 }

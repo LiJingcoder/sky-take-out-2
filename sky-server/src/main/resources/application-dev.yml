@@ -9,5 +9,11 @@ sky:
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
     access-key-id: LTAI5tJcJLh6cy33jfYWQayw
-    access-key-secret: 
+    access-key-secret: dIL8rX1aRzig9SHDozUOMJYdRz9ULG
     bucket-name: web-tlias-lijing
+  redis:
+    host: 192.168.236.128
+    port: 6379
+    password: 121911
+    database: 0
+
