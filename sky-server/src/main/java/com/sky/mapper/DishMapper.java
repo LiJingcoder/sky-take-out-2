@@ -7,10 +7,7 @@ import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.DishVO;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -60,13 +57,7 @@ public interface DishMapper {
      */
     void deleteBatch(List<Long> ids);
 
-    /**
-     * 根据dishId查询口味数据
-     * @param dishId
-     * @return
-     */
-    @Select("select * from dish_flavor where dish_id = #{dishId}")
-    List<DishFlavor> getByDishId(Long dishId);
+
 
     /**
      * 修改菜品表基本信息
@@ -74,4 +65,19 @@ public interface DishMapper {
      */
     @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);
+
+    /**
+     * 根据分类id查询菜品
+     * @param dish
+     * @return
+     */
+    List<Dish> getByCatogoryId(Dish dish);
+
+    /**
+     * 套餐起售、停售
+     * @param id
+     * @return
+     */
+    @Select("select a.* from dish a left join setmeal_dish sd on a.id = sd.dish_id where sd.setmeal_id = #{id}")
+    List<Dish> getBySetmealId(Long id);
 }

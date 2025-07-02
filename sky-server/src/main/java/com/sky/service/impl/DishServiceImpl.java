@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -116,7 +117,7 @@ public class DishServiceImpl implements DishService {
         Dish dish = dishMapper.getById(id);
 
         //根据菜品id查询口味数据
-        List<DishFlavor> dishFlavors = dishMapper.getByDishId(id);
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
         DishVO dishVO = new DishVO();
         BeanUtils.copyProperties(dish,dishVO);//复制一部分信息到dishVO中
         dishVO.setFlavors(dishFlavors);
@@ -145,5 +146,57 @@ public class DishServiceImpl implements DishService {
             });
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    /**
+     * 菜品起售、停售
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = new Dish();
+        dish.setId(id);
+        dish.setStatus(status);
+        //这里注意时间什么的以及在AutoFill中统一添加
+        dishMapper.update(dish);
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    public List<Dish> listById(Long categoryId) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
+        List<Dish> dishList = dishMapper.getByCatogoryId(dish);
+        System.out.println(dishList);
+        return dishList;
+    }
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.getByCatogoryId(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d, dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
     }
 }

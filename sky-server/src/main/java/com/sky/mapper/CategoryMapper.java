@@ -49,6 +49,6 @@ public interface CategoryMapper {
      * @param type
      * @return
      */
-    @Select("select * from category where type = #{type};")
+    //@Select("select * from category where status = 1 and type = #{type};")
     List<Category> getByType(Integer type);
 }
