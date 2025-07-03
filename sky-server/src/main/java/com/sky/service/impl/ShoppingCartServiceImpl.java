@@ -1,6 +1,5 @@
 package com.sky.service.impl;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.sky.context.BaseContext;
 import com.sky.dto.ShoppingCartDTO;
 import com.sky.entity.Dish;
@@ -10,6 +9,7 @@ import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.service.ShoppingCartService;
+import org.springframework.beans.BeanMetadataAttribute;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,5 +85,25 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void deleteAll() {
         Long userId = BaseContext.getCurrentId();//获取当前微信用户的id
         shoppingCartMapper.deleteByUserId(userId);
+    }
+
+    /**
+     * 删除购物车中的一件商品
+     * @param shoppingCartDTO
+     */
+    public void sub(ShoppingCartDTO shoppingCartDTO) {
+        Long userId = BaseContext.getCurrentId();
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
+        shoppingCart.setUserId(userId);
+        List<ShoppingCart> shoppingCarts = shoppingCartMapper.list(shoppingCart);
+        Integer number = shoppingCarts.get(0).getNumber()-1;
+        if(number>=1){//只修改number参数
+            ShoppingCart cart = shoppingCarts.get(0);
+            cart.setNumber(number);
+            shoppingCartMapper.updateNumberById(cart);
+        }else{//讲该表项删除
+            shoppingCartMapper.deleteById(shoppingCarts.get(0));
+        }
     }
 }
